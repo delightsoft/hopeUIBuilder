@@ -9,7 +9,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
       change: fieldInitData.onChange,
     },
     props: {
-      filled: true,
+      filled: false,
+      outlined: true,
       disabled: true,
       readonly: true,
     },

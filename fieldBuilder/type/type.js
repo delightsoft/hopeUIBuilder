@@ -28,4 +28,7 @@ export default {
   attachedFiles: require('./ud/attachedFiles').default,
   autocomplete: require('./ud/autocomplete').default,
   englishProficiency: require('./ud/englishProficiency').default,
+  experienceTime: require('./ud/experienceTime').default,
+  editor: require('./ud/editor').default,
+  year: require('./ud/year').default,
 }

@@ -54,7 +54,6 @@ export default {
     'value',
     'currencyFieldValue',
     'options',
-    'readonly',
     'hint',
     'label',
     'readonly',

@@ -38,10 +38,46 @@
             <q-date
               v-model="model"
               :mask="modeFormat"
+              :navigation-min-year-month="minYearMonth"
+              :navigation-max-year-month="maxYearMonth"
               format24h
               :options="options"
               @input="() => {
                 $refs[`${fieldKey}Date`].hide();
+              }"
+              :minimal="true"
+            />
+          </q-popup-proxy>
+        </q-icon>
+      </template>
+
+      <template
+        v-else-if="mode === 'yearMonth' || mode === 'year'"
+        v-slot:prepend
+      >
+      <q-icon
+          class="cursor-pointer"
+          name="event"
+        >
+          <q-popup-proxy
+            :ref="`${fieldKey}Date`"
+            transition-show="scale"
+            transition-hide="scale"
+          >
+            <q-date
+              v-model="tempModel"
+              :mask="modeFormat"
+              format24h
+              default-view="Years"
+              :navigation-min-year-month="minYearMonth"
+              :navigation-max-year-month="maxYearMonth"
+              :emit-immediately="true"
+              @input="(value, reason, details) => {
+                if ((mode === 'yearMonth' && reason === 'month') ||
+                    (mode === 'year' && reason === 'year')) {
+                  model = tempModel
+                  $refs[`${fieldKey}Date`].hide();
+                }
               }"
               :minimal="true"
             />
@@ -93,10 +129,13 @@ export default {
     'errorMessage',
     'options',
     'tabindex',
+    'navigationMinYearMonth',
+    'navigationMaxYearMonth'
   ],
   data() {
     return {
       model: null,
+      tempModel: null,
       formats: {
         'date': {
           format: 'YYYY-MM-DD',
@@ -113,6 +152,16 @@ export default {
           localeFormatName: 'date',
           htmlType: 'datetime-local',
         },
+        'yearMonth': {
+          format: 'YYYY-MM-DD',
+          localeFormatName: 'yearMonth',
+          htmlType: 'date',
+        },
+        year: {
+          format: 'YYYY-MM-DD',
+          localeFormatName: 'year',
+          htmlType: 'date',
+        }
       }
     }
   },
@@ -125,12 +174,14 @@ export default {
     },
     modeFormat() {
       const mode = this.mode;
+
       let format = this.$app.locale[this.formats[mode].localeFormatName].format;
       if (!format) throw new Error(`Unexpected mode ${mode}`);
       return format;
     },
     mask() {
       const mode = this.mode;
+
       let format = this.$app.locale[this.formats[mode].localeFormatName].mask;
       if (!format) throw new Error(`Unexpected mode ${mode}`);
       return format;
@@ -141,6 +192,18 @@ export default {
       if (!htmlType) throw new Error(`Unexpected mode ${mode}`);
       return htmlType;
     },
+    minYearMonth() {
+      if (this.navigationMinYearMonth) {
+        return moment(this.navigationMinYearMonth).format("YYYY/MM")
+      }
+      return null
+    },
+    maxYearMonth() {
+      if (this.navigationMaxYearMonth) {
+        return moment(this.navigationMaxYearMonth).format("YYYY/MM")
+      }
+      return null
+    }
   },
   methods: {
     emulateKeyboardTabDown: emulateKeyboardTabDown,
@@ -161,12 +224,14 @@ export default {
     }
   },
   watch: {
-    'value'() {
-      this.setModel();
+    'value': {
+      handler() {
+        this.setModel();
+      },
+      immediate: true
     },
     'model'() {
       const date = moment(this.model, this.modeFormat);
-
       if (date.isValid() && !date._pf.unusedInput.length) {
         this.$emit('change', date.format(this.valueFormat));
       } else {

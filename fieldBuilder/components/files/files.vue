@@ -47,20 +47,20 @@ export default {
 
   .upload
     flex: 1 2 200px
-    margin-bottom: 14.4px;
-    margin-right: 14.4px;
+    margin-bottom: 14.4px
+    margin-right: 14.4px
 
   .list-files
     align-items: center
     max-width: 100%
     margin-bottom: 14.4px
-    display: flex;
-    flex-wrap: nowrap;
-    flex-direction: row-reverse;
+    display: flex
+    flex-wrap: nowrap
+    flex-direction: row-reverse
 
     .q-list
-      flex: 1 1 0%;
-      overflow: hidden;
+      flex: 1 1 0%
+      overflow: hidden
 
       .q-item__label
         white-space: nowrap

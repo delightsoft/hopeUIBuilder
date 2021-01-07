@@ -95,7 +95,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
       ...inputFilter.call(this, filter),
     },
     props: {
-      filled: true,
+      filled: false,
+      outlined: true,
       value: fieldInitData.model[fieldInitData.fieldName],
     },
     attrs: {

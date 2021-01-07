@@ -1,10 +1,19 @@
 import { QIcon, QSelect } from 'quasar'
+import {range as _range} from 'lodash'
 import readonly from '../../components/readonly'
 import tooltip from '../../components/tooltip'
 
 export default function ({ fieldInitData, additionalFieldProps }) {
+  const min = 1950
+  const max = new Date().getFullYear()
+  const array = _range(min, max + 1).sort((a, b) => b - a)
+
+  if (fieldInitData.props.value > max || fieldInitData.props.value < min) {
+    fieldInitData.onInput(max)
+  }
+
   return {
-    name: 'enum',
+    name: 'year',
     component: QSelect,
     readonlyComponent: readonly,
     on: {
@@ -17,18 +26,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
       'map-options': true,
       filled: false,
       outlined: true,
-      options: [
-        ...fieldInitData.field.enum.$$list.reduce((acc, option) => {
-          if (!option.extra || !option.extra.hasOwnProperty('selectable') || option.extra.selectable)
-            acc.push(
-              {
-                label: this.$t(this.$t(option.$$key)),
-                value: option.name,
-              });
-          return acc;
-        }, []),
-      ],
-      ...fieldInitData.props.readonly && { value: this.$t(this.$t(fieldInitData.field.enum.$$list.find(option => fieldInitData.model[fieldInitData.fieldName] === option.name)?.$$key)) },
+      options: array,
+      'popup-content-class': 'field-year-popup'
     },
     attrs: {
       tabindex: fieldInitData.tabindex,
@@ -40,7 +39,6 @@ export default function ({ fieldInitData, additionalFieldProps }) {
           [`${fieldInitData.field.$$key}.label`]: this.$t(`${fieldInitData.field.$$key}.label`),
           [`${fieldInitData.field.$$key}.hint`]: this.$t(`${fieldInitData.field.$$key}.hint`),
           [`${fieldInitData.field.$$key}.tooltip`]: this.$t(`${fieldInitData.field.$$key}.tooltip`),
-          ...fieldInitData.field.enum.$$list.reduce((acc, option) => ({...acc, [option.$$key]: this.$t(option.$$key)}), {}),
         },
       }
     ],

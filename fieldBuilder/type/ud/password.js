@@ -25,7 +25,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
     },
     props: {
       type: this.uiModel[fieldInitData.fieldName].isPwd ? 'password' : 'text',
-      filled: true,
+      filled: false,
+      outlined: true
     },
     attrs: {
       tabindex: fieldInitData.tabindex,

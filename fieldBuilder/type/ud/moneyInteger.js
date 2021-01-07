@@ -20,7 +20,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
     component: QField,
     readonlyComponent: readonly,
     props: {
-      filled: true,
+      filled: false,
+      outlined: true
     },
     on: {
       focus: () => {

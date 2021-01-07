@@ -1,4 +1,4 @@
-const debug = require('debug/dist/debug')('tableBuilder');
+const debug = require('debug')('tableBuilder');
 
 export default {
   createColumns: require('./createColumns').default({ debug }),

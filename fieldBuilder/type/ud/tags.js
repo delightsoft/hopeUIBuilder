@@ -25,7 +25,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
       },
     },
     props: {
-      filled: true,
+      filled: false,
+      outlined: true,
       'use-input': true,
       'use-chips': true,
       'multiple': true,

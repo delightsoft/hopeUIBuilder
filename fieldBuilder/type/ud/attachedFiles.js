@@ -1,6 +1,7 @@
 import files from '../../components/files/files'
 import Vue from 'vue'
 import { decode } from 'jsonwebtoken'
+import readOnlyAttachedFiles from '../../components/readonly/readOnlyAttachedFiles.vue'
 
 export default function ({ fieldInitData, additionalFieldProps }) {
   if (!this.uiModel.hasOwnProperty(fieldInitData.fieldName)) {
@@ -31,6 +32,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
   return {
     name: 'attachedFiles',
     component: files,
+    readonlyComponent: readOnlyAttachedFiles,
     props: {
       fieldInitData,
       additionalFieldProps,

@@ -15,7 +15,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
       ...inputFilter.call(this, value => new RegExp(`^-?\\d*[.]?\\d{0,${fieldInitData.field.scale}}$`).test(value)),
     },
     props: {
-      filled: true,
+      filled: false,
+      outlined: true,
       value: fieldInitData.model[fieldInitData.fieldName],
     },
     attrs: {

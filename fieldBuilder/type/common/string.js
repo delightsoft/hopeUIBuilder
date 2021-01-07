@@ -3,6 +3,18 @@ import readonly from '../../components/readonly'
 import tooltip from '../../components/tooltip'
 import emulateKeyboardTabDown from '../../../utils/emulateKeyboardTabDown'
 export default function ({ fieldInitData, additionalFieldProps }) {
+  let linkFormatting = function(value) {
+    return value ? `<a href="${value}">${value}</a>` : '—'
+  }
+
+  let readOnlyFormatting = function() {
+    if (additionalFieldProps.readOnlyFormatting) return additionalFieldProps.readOnlyFormatting;
+    if (fieldInitData.field.udType?.length > 0) {
+      return fieldInitData.field.udType.includes('websiteLink') ? linkFormatting : undefined
+    }
+    return undefined
+  }
+
   return {
     name: 'string',
     component: QInput,
@@ -17,8 +29,9 @@ export default function ({ fieldInitData, additionalFieldProps }) {
       },
     },
     props: {
-      //filled: true,
-      outlined: true
+      filled: false,
+      outlined: true,
+      readOnlyFormatting: readOnlyFormatting()
     },
     attrs: {
       tabindex: fieldInitData.tabindex,

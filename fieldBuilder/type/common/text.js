@@ -12,6 +12,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
       input: fieldInitData.inputDebounce(value => fieldInitData.onInput(value, null, null, true, true)),
     },
     props: {
+      filled: false,
       outlined: true,
       type: 'textarea',
     },

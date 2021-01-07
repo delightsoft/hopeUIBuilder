@@ -1,9 +1,11 @@
 import { QBtn } from 'quasar'
+import readonly from '../../components/readonly/index.vue'
 
 export default function ({ fieldInitData, additionalFieldProps }) {
   return {
     name: 'subtable',
     component: 'div',
+    readonlyComponent: fieldInitData.props.value.length > 0 ? undefined : readonly,
     col: {
       xs: 12,
       sm: 12,
@@ -42,8 +44,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
               class: `col-12`,
               style: 'margin-bottom: 0;',
             }, [
-              this.$t(this.$t(`${fieldInitData.field.$$key}.subtitle`)),
-            ]
+            this.$t(this.$t(`${fieldInitData.field.$$key}.subtitle`)),
+          ]
           ),
         ],
       ),
@@ -53,7 +55,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
           class: 'array-item col-12',
         },
         [
-          this.h(
+          !additionalFieldProps.sectionUntitled && this.h(
             'h3',
             {
               class: 'text-h7',
@@ -88,6 +90,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
                         color: 'primary',
                         outline: true,
                         unelevated: true,
+                        tabindex: fieldInitData.tabindex,
                       },
                       on: {
                         click: () => fieldInitData.deleteElementFromArray(index),
@@ -109,6 +112,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
           )
         ]
       )),
+
       !fieldInitData.props.readonly && (fieldInitData.model[fieldInitData.fieldName]?.length < additionalFieldProps.elementsLimit || !additionalFieldProps.elementsLimit) ?
         this.h(
           QBtn,
@@ -119,6 +123,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
               color: 'primary',
               outline: true,
               unelevated: true,
+              tabindex: fieldInitData.tabindex,
             },
             on: {
               click: fieldInitData.addElementInArray,

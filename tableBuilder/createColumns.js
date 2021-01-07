@@ -11,22 +11,20 @@ export default ({ debug }) => {
       const sortingOpts = sortingOptions.find(sortingOptions => sortingOptions._value === field.name);
       if (view && !view.get(field.$$index)) return;
       if (!field.type) throw new Error('Field must contain type property');
-      const canBeHidden = field.hasOwnProperty('extra') && field.extra.hasOwnProperty('canBeHidden') ? field.extra.canBeHidden : true;
+      const canBeHidden = field.extra.hasOwnProperty('canBeHidden') ? field.extra.canBeHidden : true;
       const col = {
         name: field.name,
         field: field.name,
         key: `${field.$$key}.label`,
-        order: (field.extra && field.extra.colOrder) || 100,
+        order: field.extra.colOrder || 100,
         isSortable: !!sortingOpts,
         ...sortingOpts,
         isHidden: canBeHidden && Array.isArray(visibleColumns) ? !visibleColumns.find(col => col === field.name) : false,
         canBeHidden,
       };
       switch (field.type) {
-        case 'nanoid':
         case 'string':
         case 'text':
-        case 'json':
         case 'boolean':
         case 'enum':
           col.align = 'left';
@@ -35,7 +33,6 @@ export default ({ debug }) => {
         case 'integer':
         case 'double':
         case 'time': // local
-        case 'timestamp':
         case 'date': // UTC
         case 'dateonly': // local
         case 'now':

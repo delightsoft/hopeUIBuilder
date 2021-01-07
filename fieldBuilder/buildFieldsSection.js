@@ -79,19 +79,6 @@ export default ({ debug }) => {
     },
     methods: {
       getChildren({ h, fields, parent = {} }) {
-        for (const key in this.errors) {
-          if (this.errors.hasOwnProperty(key)) {
-            const message = this.errors[key];
-
-            const splittedMessage = message.path.split(".")
-            if (splittedMessage.length > 1) {
-              this.errors[splittedMessage[0]] = message;
-              this.errors[splittedMessage[0]].path = splittedMessage[0]
-              delete this.errors[key]
-            }
-          }
-        }
-
         return fields.map(field => {
           const fieldName = field.name;
           const fieldNameWithParentFieldName = [parent.name ? `${parent.name.join('.field.')}.field` : '', fieldName].filter(Boolean).join('.'); // используется для лейблов
@@ -101,6 +88,23 @@ export default ({ debug }) => {
             fieldNameWithParentFieldNameWithIndex += `.${fieldName}`;
           } else {
             fieldNameWithParentFieldNameWithIndex = fieldNameWithParentFieldName;
+          }
+
+          if (field.type === 'structure') {
+            for (const key in this.errors) {
+              if (this.errors.hasOwnProperty(key)) {
+                const error = this.errors[key];
+                
+                const splittedErrorPath = error.path.split(".")
+                if (splittedErrorPath[0] === field.name) {
+                  if (splittedErrorPath.length > 1) {
+                    this.errors[splittedErrorPath[0]] = error;
+                    this.errors[splittedErrorPath[0]].path = splittedErrorPath[0]
+                    delete this.errors[key]
+                  }
+                }
+              }
+            }
           }
 
           return (this.cache[fieldNameWithParentFieldNameWithIndex] || (
@@ -146,7 +150,7 @@ export default ({ debug }) => {
                   }
 
                   const model = _getModel(this.value, parent);
-                  model[fieldName] = typeof _value === 'string' ? _value.trim() : _value;
+                  model[fieldName] = _value;
                   if (!system && model.$$touched) {
                     Vue.set(model.$$touched, fieldName, true);
                   }
@@ -167,7 +171,7 @@ export default ({ debug }) => {
                  * */
                 const onInput = (value, useFieldName, system, touchedIgnore, gtmIgnore) => {
                   const model = _getModel(this.value, parent);
-                  model[useFieldName || fieldName] = typeof value === 'string' ? value.trim() : value;
+                  model[useFieldName || fieldName] = value;
                   if (!system && model.$$touched && !touchedIgnore) {
                     Vue.set(model.$$touched, useFieldName || fieldName, true);
                   }

@@ -1,95 +1,103 @@
 <template>
   <div class="list-files">
 
-    <q-item-label style="flex:0;" header>{{ additionalFieldProps.documentLabel || $t('download.documents') }}</q-item-label>
+    <q-item-label style="flex:0;" header>{{
+        additionalFieldProps.documentLabel || $t('download.documents')
+      }}
+    </q-item-label>
 
     <!-- FILES START -->
     <q-list bordered separator class="rounded-borders">
-      <q-item
+      <template
         v-for="file in listFiles"
-        :key="file.docId"
-        v-if="!file.isDeleted"
-        :class="getClassItem(file)"
       >
 
-        <!-- File icon -->
-        <q-item-section avatar>
-          <q-icon
-            :name="getFileProps(file.extension).icon"
-            :color="getFileProps(file.extension).color"
-            size="24px"
-          ></q-icon>
-        </q-item-section>
+        <q-item
+          :key="file.docId"
+          v-if="!file.isDeleted"
+          :class="getClassItem(file)"
+        >
 
-        <!-- Label -->
-        <q-item-section>
-          <!-- file name -->
-          <q-item-label style="overflow: hidden">{{ `${file.fileName}` }}</q-item-label>
-          <!-- downloading -->
-          <q-item-label
-            v-if="fileIsDownloading(file)"
-            caption
-            class="text-primary"
-          >
-            {{ $t('download.downloading') }}
-          </q-item-label>
-          <!-- error download -->
-          <q-item-label
-            v-if="fileIsErrorDownload(file)"
-            caption
-            class="text-primary"
-          >
-            {{ $t('download.errorDownload') }}
-          </q-item-label>
-          <!-- file downloaded -->
-          <q-item-label
-            v-if="fileIsDownloaded(file)"
-            caption
-            class="text-primary"
-          >
-            {{ $t('download.downloaded') }}
-          </q-item-label>
-          <!-- deleting -->
-          <q-item-label
-            v-if="fileIsDeleting(file)"
-            caption
-            class="text-primary"
-          >
-            {{ $t('download.deleting') }}
-          </q-item-label>
-          <!-- error delete -->
-          <q-item-label
-            v-if="fileIsErrorDelete(file)"
-            caption
-            class="text-primary"
-          >
-            {{ $t('download.errorDelete') }}
-          </q-item-label>
-          <!-- file deleted -->
-          <q-item-label
-            v-if="fileIsDeleted(file)"
-            caption
-            class="text-primary"
-          >
-            {{ $t('download.deleted') }}
-          </q-item-label>
+          <!-- File icon -->
+          <q-item-section avatar>
+            <q-icon
+              :name="getFileProps(file.extension).icon"
+              :color="getFileProps(file.extension).color"
+              size="24px"
+            ></q-icon>
+          </q-item-section>
 
-        </q-item-section>
+          <!-- Label -->
+          <q-item-section>
+            <!-- file name -->
+            <q-item-label style="overflow: hidden">{{ `${file.fileName}` }}</q-item-label>
+            <!-- downloading -->
+            <q-item-label
+              v-if="fileIsDownloading(file)"
+              caption
+              class="text-primary"
+            >
+              {{ $t('download.downloading') }}
+            </q-item-label>
+            <!-- error download -->
+            <q-item-label
+              v-if="fileIsErrorDownload(file)"
+              caption
+              class="text-primary"
+            >
+              {{ $t('download.errorDownload') }}
+            </q-item-label>
+            <!-- file downloaded -->
+            <q-item-label
+              v-if="fileIsDownloaded(file)"
+              caption
+              class="text-primary"
+            >
+              {{ $t('download.downloaded') }}
+            </q-item-label>
+            <!-- deleting -->
+            <q-item-label
+              v-if="fileIsDeleting(file)"
+              caption
+              class="text-primary"
+            >
+              {{ $t('download.deleting') }}
+            </q-item-label>
+            <!-- error delete -->
+            <q-item-label
+              v-if="fileIsErrorDelete(file)"
+              caption
+              class="text-primary"
+            >
+              {{ $t('download.errorDelete') }}
+            </q-item-label>
+            <!-- file deleted -->
+            <q-item-label
+              v-if="fileIsDeleted(file)"
+              caption
+              class="text-primary"
+            >
+              {{ $t('download.deleted') }}
+            </q-item-label>
 
-        <!-- Action -->
-        <q-item-section side>
-          <div class="text-grey-8">
-            <!-- download -->
-            <q-btn size="12px" unelevated flat dense round icon="far fa-arrow-alt-circle-down"
-                   @click="download(file)">
-            </q-btn>
-            <!-- delete -->
-<!--            <q-btn v-if="canDelete" size="12px" unelevated flat dense round icon="far fa-trash-alt"-->
-<!--                   @click="confirmDelete(file)"></q-btn>-->
-          </div>
-        </q-item-section>
+          </q-item-section>
 
-      </q-item>
+          <!-- Action -->
+          <q-item-section side>
+            <div class="text-grey-8">
+              <!-- download -->
+              <q-btn size="12px" unelevated flat dense round icon="far fa-arrow-alt-circle-down"
+                     @click="download(file)">
+              </q-btn>
+              <!-- delete -->
+              <!--            <q-btn v-if="canDelete" size="12px" unelevated flat dense round icon="far fa-trash-alt"-->
+              <!--                   @click="confirmDelete(file)"></q-btn>-->
+            </div>
+          </q-item-section>
+
+        </q-item>
+      </template>
+
     </q-list>
     <!-- FILES END -->
 

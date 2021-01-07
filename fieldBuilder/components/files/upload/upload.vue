@@ -32,7 +32,7 @@
       </template>
 
       <template v-slot:list="scope">
-        <div></div>
+        <div>{{scope}}</div>
       </template>
 
     </q-uploader>

@@ -18,7 +18,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
       },
     },
     props: {
-      filled: true,
+      filled: false,
+      outlined: true,
       type: 'email',
     },
     attrs: {

@@ -4,7 +4,7 @@
     <div v-if="error" class="q-field--error">
       <label class="q-field q-field__bottom error" v-html="errorMessage"></label>
     </div>
-    <div v-else>
+    <div v-else-if="hint">
       <label class="q-field q-field__bottom" v-html="hint"></label>
     </div>
   </div>

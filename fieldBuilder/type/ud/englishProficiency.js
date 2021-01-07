@@ -16,7 +16,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
       'option-label': 'label',
       'emit-value': true,
       'map-options': true,
-      filled: true,
+      filled: false,
+      outlined: true,
       options: [
         ...fieldInitData.field.enum.$$list.reduce((acc, option) => {
           if (!option.extra || !option.extra.hasOwnProperty('selectable') || option.extra.selectable)

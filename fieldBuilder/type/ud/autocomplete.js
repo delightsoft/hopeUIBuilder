@@ -1,5 +1,3 @@
-// TODO лоадер меняет ширину поля
-
 import readonly from '../../components/readonly'
 import Vue from 'vue'
 import APICommon from '../../../../APICommon'
@@ -14,6 +12,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
     Vue.set(this.uiModel[fieldInitData.fieldName], 'filteredOptions', []);
     Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', false);
   }
+
+  const userId = this.$profile.model.id;
 
   this._api = new APICommon;
   const ref = `autocomplete_${fieldInitData.fieldName}`
@@ -51,24 +51,44 @@ export default function ({ fieldInitData, additionalFieldProps }) {
   return {
     name: 'autocomplete',
     component: errorWrapper,
+    readonlyComponent: readonly,
     props: {
       error: fieldInitData.props.error,
       'error-message': fieldInitData.props['error-message'],
-      hint: fieldInitData.props.hint
+      hint: fieldInitData.props.hint,
+      readonlyWithoutDefaultSlot: true
     },
     scopedSlots: {
       default: () => this.h(
         Multiselect,
         {
           name: 'autocomplete',
-          readonlyComponent: readonly,
           ref,
           on: {
             tag: async (newTag) => {
               const compo = this.$refs[ref]
-              let technology = doc.fields.$$new({ edit: false })
-              technology.label = newTag;
-              technology.createdByUser = true
+
+              const findedTechnologies = await this._api.invoke({
+                service: 'hope',
+                method: 'list',
+                args: {
+                  type: additionalFieldProps.data,
+                  filter: {
+                    hardMatchByLabel: newTag
+                  },
+                }
+              })
+
+              let technology;
+              if (findedTechnologies.data.length === 0) {
+                technology = doc.fields.$$new({ edit: false })
+                technology.label = newTag;
+                technology.createdByUser = true;
+                technology.creator = [{docId: userId}];
+              } else {
+                technology = findedTechnologies.data[0]
+                technology.creator.push({docId: userId})
+              }
 
               const res = await this._api.invoke({
                 service: "hope",
@@ -103,7 +123,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
                 args: {
                   type: additionalFieldProps.data,
                   filter: {
-                    search: formattedSearch
+                    search: formattedSearch,
+                    creator: userId
                   },
                   limit
                 }
@@ -111,6 +132,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
 
               // Формат options для разных типов документов
               const items = res.data.map(i => optionsFormat(i))
+
               Vue.set(this.uiModel[fieldInitData.fieldName], 'filteredOptions', items);
               Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', false);
             },
@@ -119,7 +141,6 @@ export default function ({ fieldInitData, additionalFieldProps }) {
               fieldInitData.onInput(value)
             },
             close: (value, id) => {
-              console.log(fieldInitData)
               Vue.set(this.uiModel[fieldInitData.fieldName], 'filteredOptions', []);
             }
           },

@@ -1,11 +1,12 @@
 import { cloneDeep } from 'lodash'
+import readonly from '../../components/readonly'
 
 export default function ({ fieldInitData, additionalFieldProps }) {
   let _parent;
 
   if (parent) {
     _parent = cloneDeep(fieldInitData.parent);
-    _parent.name.push(fieldInitData.fieldName)
+    // _parent.name.push(fieldInitData.fieldName)
   } else {
     _parent = {
       name: [...fieldInitData.parent.name || [], fieldInitData.fieldName],
@@ -26,6 +27,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
   return {
     name: 'structure',
     component: 'div',
+    readonlyComponent: readonly,
     classes: ['array-item', 'col-12'],
     directives: [
       {

@@ -2,8 +2,8 @@ import Vue from 'vue'
 import { QTr, QTd } from 'quasar'
 import type from './type'
 import goTo from '../../utils/goTo'
-import pathExists from "../../utils/pathExists";
-import {isFunction} from "lodash";
+import pathExists from '../../utils/pathExists'
+import { isFunction } from 'lodash'
 
 export default ({ debug }) => {
   return Vue.extend({
