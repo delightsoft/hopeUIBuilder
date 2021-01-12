@@ -29,10 +29,10 @@ export default function ({ fieldInitData, additionalFieldProps }) {
     },
     `${fieldInitData.props.required ? '*' : ''}`
   )
-
-  let optionsFormat = i => i;
+  
+  let optionsFormat = additionalFieldProps.optionsFormat || (i => i);
   let propTrackBy = 'docId'
-  let propPlaceholder = fieldInitData.props.label || 'Select option';
+  let propPlaceholder = additionalFieldProps.propPlaceholder || fieldInitData.props.label || 'Select option';
   switch (additionalFieldProps.data) {
     case 'devjbs.Technology':
       optionsFormat = i => ({ label: i.label, docId: i.id })
