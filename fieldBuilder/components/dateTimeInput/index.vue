@@ -1,8 +1,6 @@
-<template>
-  <div
-    class="date-time-input"
-  >
-    <q-input
+<template lang="pug">
+  .date-time-input
+    q-input(
       :value="model"
       @change="onChange"
       :mask="mask"
@@ -14,57 +12,36 @@
       fill-mask
       @keydown.enter="emulateKeyboardTabDown"
       :tabindex="tabindex"
-    >
-      <template
-        v-if="$scopedSlots.after"
-        v-slot:after
-      >
-        <slot name="after" />
-      </template>
+    )
+      template(v-if="$scopedSlots.after" v-slot:after)
+        slot(name="after")
 
-      <template
-        v-if="mode === 'date' || mode === 'timestamp'"
-        v-slot:prepend
-      >
-        <q-icon
-          class="cursor-pointer"
-          name="event"
-        >
-          <q-popup-proxy
+      template(v-if="mode === 'date' || mode === 'timestamp'" v-slot:prepend)
+        q-icon.cursor-pointer(name="event")
+          q-popup-proxy(
             :ref="`${fieldKey}Date`"
             transition-show="scale"
             transition-hide="scale"
-          >
-            <q-date
+          )
+            q-date(
               v-model="model"
               :mask="modeFormat"
               :navigation-min-year-month="minYearMonth"
               :navigation-max-year-month="maxYearMonth"
               format24h
               :options="options"
-              @input="() => {
-                $refs[`${fieldKey}Date`].hide();
-              }"
+              @input="onInputDate"
               :minimal="true"
-            />
-          </q-popup-proxy>
-        </q-icon>
-      </template>
+            )
 
-      <template
-        v-else-if="mode === 'yearMonth' || mode === 'year'"
-        v-slot:prepend
-      >
-      <q-icon
-          class="cursor-pointer"
-          name="event"
-        >
-          <q-popup-proxy
+      template(v-else-if="mode === 'yearMonth' || mode === 'year'" v-slot:prepend)
+        q-icon.cursor-pointer(name="event")
+          q-popup-proxy(
             :ref="`${fieldKey}Date`"
             transition-show="scale"
             transition-hide="scale"
-          >
-            <q-date
+          )
+            q-date(
               v-model="tempModel"
               :mask="modeFormat"
               format24h
@@ -72,45 +49,22 @@
               :navigation-min-year-month="minYearMonth"
               :navigation-max-year-month="maxYearMonth"
               :emit-immediately="true"
-              @input="(value, reason, details) => {
-                if ((mode === 'yearMonth' && reason === 'month') ||
-                    (mode === 'year' && reason === 'year')) {
-                  model = tempModel
-                  $refs[`${fieldKey}Date`].hide();
-                }
-              }"
+              @input="onInputDate"
               :minimal="true"
-            />
-          </q-popup-proxy>
-        </q-icon>
-      </template>
-
-      <template
-        v-if="mode === 'time' || mode === 'timestamp'"
-        v-slot:append
-      >
-        <q-icon
-          class="cursor-pointer"
-          name="access_time"
-        >
-          <q-popup-proxy
+            )
+      template(v-if="mode === 'time' || mode === 'timestamp'" v-slot:append)
+        q-icon.cursor-pointer(name="access_time")
+          q-popup-proxy(
             :ref="`${fieldKey}Time`"
             transition-show="scale"
             transition-hide="scale"
-          >
-            <q-time
+          )
+            q-time(
               v-model="model"
               :mask="modeFormat"
               format24h
-              @input="() => {
-                $refs[`${fieldKey}Time`].hide();
-              }"
-            />
-          </q-popup-proxy>
-        </q-icon>
-      </template>
-    </q-input>
-  </div>
+              @input="onInputTime"
+            )
 </template>
 
 <script>
@@ -193,19 +147,29 @@ export default {
       return htmlType;
     },
     minYearMonth() {
-      if (this.navigationMinYearMonth) {
+      if (typeof this.navigationMinYearMonth === 'string') {
         return moment(this.navigationMinYearMonth).format("YYYY/MM")
       }
-      return null
+      return undefined
     },
     maxYearMonth() {
-      if (this.navigationMaxYearMonth) {
+      if (typeof this.navigationMaxYearMonth === 'string') {
         return moment(this.navigationMaxYearMonth).format("YYYY/MM")
       }
-      return null
+      return undefined
     }
   },
   methods: {
+    onInputDate(value, reason, details) {
+      if ((this.mode === 'yearMonth' && reason === 'month') ||
+        (this.mode === 'year' && reason === 'year')) {
+        this.model = this.tempModel
+      }
+      this.$refs[`${this.fieldKey}Date`].hide()
+    },
+    onInputTime(value, reason, details) {
+      this.$refs[`${this.fieldKey}Time`].hide();
+    },
     emulateKeyboardTabDown: emulateKeyboardTabDown,
     onChange(event) {
       let value = event.srcElement.valueAsNumber || event.srcElement.value;
