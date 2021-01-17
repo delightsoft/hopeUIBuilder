@@ -30,22 +30,9 @@ export default function ({ fieldInitData, additionalFieldProps }) {
     `${fieldInitData.props.required ? '*' : ''}`
   )
 
-  let optionsFormat = i => i;
+  let optionsFormat = additionalFieldProps.optionsFormat || (i => i);
+  let propPlaceholder = additionalFieldProps.propPlaceholder || fieldInitData.props.label || 'Select option';
   let propTrackBy = 'docId'
-  let propPlaceholder = fieldInitData.props.label || 'Select option';
-  switch (additionalFieldProps.data) {
-    case 'devjbs.Technology':
-      optionsFormat = i => ({ label: i.label, docId: i.id })
-      propPlaceholder = "Select technologies"
-      break;
-    case 'devjbs.WorldCity':
-      optionsFormat = i => ({ label: `${i.country}, ${i.cityAscii}`, docId: i.id })
-      propPlaceholder = "Select city"
-      break;
-
-    default:
-      break;
-  }
   let limit = 15;
 
   return {
@@ -137,6 +124,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
               Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', false);
             },
             input: (value) => {
+              console.log(888, value)
               // Стандартное поведение при вводе значения
               fieldInitData.onInput(value)
             },
