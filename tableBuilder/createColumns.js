@@ -1,5 +1,5 @@
-export default ({ debug }) => {
-  return ({ fields, view, _this, sortingOptions = [], fieldsKey = {} }) => {
+export default ({debug}) => {
+  return ({fields, view, _this, sortingOptions = [], fieldsKey = {}}) => {
     if (!fields) throw new Error('Unexpected fields');
     debug('createColumns({ fields: %o })', fields);
 
@@ -11,27 +11,35 @@ export default ({ debug }) => {
       const sortingOpts = sortingOptions.find(sortingOptions => sortingOptions._value === field.name);
       if (view && !view.get(field.$$index)) return;
       if (!field.type) throw new Error('Field must contain type property');
-      const canBeHidden = field.extra.hasOwnProperty('canBeHidden') ? field.extra.canBeHidden : true;
+      const canBeHidden = field.extra && field.extra.hasOwnProperty('canBeHidden') ? field.extra.canBeHidden : true;
       const col = {
         name: field.name,
         field: field.name,
+        label: field.name, // `${field.$$key}.label`,
         key: `${field.$$key}.label`,
-        order: field.extra.colOrder || 100,
+        order: (field.extra && field.extra.colOrder) || 100,
+        sortable: true,
         isSortable: !!sortingOpts,
         ...sortingOpts,
         isHidden: canBeHidden && Array.isArray(visibleColumns) ? !visibleColumns.find(col => col === field.name) : false,
         canBeHidden,
+        type: field.type,
+        required: field.required
       };
       switch (field.type) {
         case 'string':
         case 'text':
         case 'boolean':
         case 'enum':
+        case 'nanoid':
+        case 'structure':
+        case 'json':
           col.align = 'left';
           break;
         case 'decimal':
         case 'integer':
         case 'double':
+        case 'timestamp':
         case 'time': // local
         case 'date': // UTC
         case 'dateonly': // local
