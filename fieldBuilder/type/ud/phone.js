@@ -44,7 +44,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
             },
             input: fieldInitData.inputDebounce(value => {
               Vue.set(this.uiModel[fieldInitData.fieldName], 'phone', value || null);
-              fieldInitData.onInput({ phoneFormatted: this.uiModel[fieldInitData.fieldName].phone, countryCode: this.uiModel[fieldInitData.fieldName].countryCode })
+              // fieldInitData.onInput({ phoneFormatted: this.uiModel[fieldInitData.fieldName].phone, countryCode: this.uiModel[fieldInitData.fieldName].countryCode })
+              fieldInitData.onInput(this.uiModel[fieldInitData.fieldName].phone)
             })
           },
           props: {
