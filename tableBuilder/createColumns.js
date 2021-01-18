@@ -33,6 +33,7 @@ export default ({debug}) => {
         case 'enum':
         case 'nanoid':
         case 'structure':
+        case 'subtable':
         case 'json':
           col.align = 'left';
           break;
