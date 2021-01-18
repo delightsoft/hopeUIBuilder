@@ -132,7 +132,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
               {
                 name: 'l',
                 value: {
-                  [`${fieldInitData.field.$$key}.`action.create.label`]: this.$t(`${fieldInitData.field.$$key}.action.create.label`),
+                  [`${fieldInitData.field.$$key}.action.create.label`]: this.$t(`${fieldInitData.field.$$key}.action.create.label`),
                 },
               }
             ],
