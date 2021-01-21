@@ -5,7 +5,11 @@ import Multiselect from 'vue-multiselect'
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 import errorWrapper from '../../components/errorWrapper.vue'
 
+// нужен для хранения полного объекта, после того как в onInput передается лишь id
+const fullObject = {}
+
 export default function ({ fieldInitData, additionalFieldProps }) {
+  console.log(fieldInitData)
   if (!this.uiModel.hasOwnProperty(fieldInitData.fieldName)) {
     Vue.set(this.uiModel, fieldInitData.fieldName, {});
     Vue.set(this.uiModel[fieldInitData.fieldName], 'options', null);
@@ -14,7 +18,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
   }
 
   const userId = this.$profile.model.id;
-
+  
   this._api = new APICommon;
   const ref = `autocomplete_${fieldInitData.fieldName}`
   const doc = this.$model.docs[additionalFieldProps.data]
@@ -44,6 +48,11 @@ export default function ({ fieldInitData, additionalFieldProps }) {
       'error-message': fieldInitData.props['error-message'],
       hint: fieldInitData.props.hint,
       readonlyWithoutDefaultSlot: true
+    },
+    data() {
+      return {
+        fullObject: {},
+      }
     },
     scopedSlots: {
       default: () => this.h(
@@ -119,14 +128,13 @@ export default function ({ fieldInitData, additionalFieldProps }) {
 
               // Формат options для разных типов документов
               const items = res.data.map(i => optionsFormat(i))
-
               Vue.set(this.uiModel[fieldInitData.fieldName], 'filteredOptions', items);
               Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', false);
             },
             input: (value) => {
-              console.log(888, value)
               // Стандартное поведение при вводе значения
-              fieldInitData.onInput(value)
+              fieldInitData.onInput(value.id)
+              Object.assign(fullObject, value)
             },
             close: (value, id) => {
               Vue.set(this.uiModel[fieldInitData.fieldName], 'filteredOptions', []);
@@ -158,8 +166,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
               return 'Start typing to search'
             },
             singleLabel: (value) => {
-
-              if (value && value.option && value.option.label) {
+              if (fullObject && fullObject.label) {
                 return this.h(
                   'div',
                   {
@@ -179,9 +186,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
                         },
                         class: ['multiselect__tag']
                       },
-                      value.option.label
+                      fullObject.label
                     ),
-                    // requiredElement
                   ]
                 )
               }

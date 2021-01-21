@@ -34,6 +34,7 @@ export default ({debug}) => {
         case 'nanoid':
         case 'structure':
         case 'subtable':
+        case 'docid':
         case 'json':
           col.align = 'left';
           break;
