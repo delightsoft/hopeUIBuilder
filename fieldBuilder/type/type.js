@@ -27,6 +27,7 @@ export default {
   moneyDouble: require('./ud/moneyDouble').default,
   attachedFiles: require('./ud/attachedFiles').default,
   autocomplete: require('./ud/autocomplete').default,
+  autocompleteMultiple: require('./ud/autocompleteMultiple').default,
   englishProficiency: require('./ud/englishProficiency').default,
   experienceTime: require('./ud/experienceTime').default,
   editor: require('./ud/editor').default,

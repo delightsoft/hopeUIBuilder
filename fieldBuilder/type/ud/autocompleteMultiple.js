@@ -5,9 +5,6 @@ import Multiselect from 'vue-multiselect'
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 import errorWrapper from '../../components/errorWrapper.vue'
 
-// нужен для хранения полного объекта, после того как в onInput передается лишь id
-const fullObject = {}
-
 export default function ({ fieldInitData, additionalFieldProps }) {
   if (!this.uiModel.hasOwnProperty(fieldInitData.fieldName)) {
     Vue.set(this.uiModel, fieldInitData.fieldName, {});
@@ -15,13 +12,13 @@ export default function ({ fieldInitData, additionalFieldProps }) {
     Vue.set(this.uiModel[fieldInitData.fieldName], 'filteredOptions', []);
     Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', false);
   }
-
+  
   const userId = this.$profile.model.id;
   
   this._api = new APICommon;
-  const ref = `autocomplete_${fieldInitData.fieldName}`
+  const ref = `autocompleteMultiple_${fieldInitData.fieldName}`
   const doc = this.$model.docs[additionalFieldProps.data]
-
+  
   const requiredElement = this.h(
     'div',
     {
@@ -32,14 +29,14 @@ export default function ({ fieldInitData, additionalFieldProps }) {
     },
     `${fieldInitData.props.required ? '*' : ''}`
   )
-
+  
   let optionsFormat = additionalFieldProps.optionsFormat || (i => i);
   let propPlaceholder = additionalFieldProps.propPlaceholder || fieldInitData.props.label || 'Select option';
   let propTrackBy = 'docId'
   let limit = 15;
-
+  
   return {
-    name: 'autocomplete',
+    name: 'autocompleteMultiple',
     component: errorWrapper,
     readonlyComponent: readonly,
     props: {
@@ -48,21 +45,16 @@ export default function ({ fieldInitData, additionalFieldProps }) {
       hint: fieldInitData.props.hint,
       readonlyWithoutDefaultSlot: true
     },
-    data() {
-      return {
-        fullObject: {},
-      }
-    },
     scopedSlots: {
       default: () => this.h(
         Multiselect,
         {
-          name: 'autocomplete',
+          name: 'autocompleteMultiple',
           ref,
           on: {
             tag: async (newTag) => {
               const compo = this.$refs[ref]
-
+              
               const findedTechnologies = await this._api.invoke({
                 service: 'hope',
                 method: 'list',
@@ -73,7 +65,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
                   },
                 }
               })
-
+              
               let technology;
               if (findedTechnologies.data.length === 0) {
                 technology = doc.fields.$$new({ edit: false })
@@ -84,7 +76,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
                 technology = findedTechnologies.data[0]
                 technology.creator.push({docId: userId})
               }
-
+              
               const res = await this._api.invoke({
                 service: "hope",
                 method: 'invoke',
@@ -93,7 +85,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
                   update: doc.fields.$$update(technology, undefined, { noRev: true })
                 }
               })
-
+              
               const tag = {
                 label: newTag,
                 docId: res.data.doc.id
@@ -103,13 +95,13 @@ export default function ({ fieldInitData, additionalFieldProps }) {
             },
             'search-change': async (val) => {
               Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', true);
-
+              
               // Не выполняем запрос, если строка пустая
               if (val.trim().length < 1) {
                 Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', false);
                 return
               }
-
+              
               // Запросить данные из базы
               const formattedSearch = val.toLowerCase()
               const res = await this._api.invoke({
@@ -124,16 +116,16 @@ export default function ({ fieldInitData, additionalFieldProps }) {
                   limit
                 }
               })
-
+              
               // Формат options для разных типов документов
               const items = res.data.map(i => optionsFormat(i))
+              
               Vue.set(this.uiModel[fieldInitData.fieldName], 'filteredOptions', items);
               Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', false);
             },
             input: (value) => {
               // Стандартное поведение при вводе значения
-              fieldInitData.onInput(value.id)
-              Object.assign(fullObject, value)
+              fieldInitData.onInput(value)
             },
             close: (value, id) => {
               Vue.set(this.uiModel[fieldInitData.fieldName], 'filteredOptions', []);
@@ -153,7 +145,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
             internalSearch: false,
             allowEmpty: !!additionalFieldProps.multiple,
             deselectLabel: !!additionalFieldProps.multiple ? 'Press enter to remove' : '',
-
+            
             multiple: !!additionalFieldProps.multiple,
             value: fieldInitData.props.value,
             error: fieldInitData.props.error,
@@ -165,7 +157,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
               return 'Start typing to search'
             },
             singleLabel: (value) => {
-              if (fullObject && fullObject.label) {
+              
+              if (value && value.option && value.option.label) {
                 return this.h(
                   'div',
                   {
@@ -185,12 +178,13 @@ export default function ({ fieldInitData, additionalFieldProps }) {
                         },
                         class: ['multiselect__tag']
                       },
-                      fullObject.label
+                      value.option.label
                     ),
+                    // requiredElement
                   ]
                 )
               }
-
+              
               return this.h(
                 'div',
                 {
