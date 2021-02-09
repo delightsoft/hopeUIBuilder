@@ -15,6 +15,7 @@ export default {
   uuid: require('./common/uuid').default,
   structure: require('./common/structure').default,
 
+  nanoid: require('./common/string').default,
   toggle: require('./ud/toggle').default,
   phone: require('./ud/phone').default,
   money: require('./ud/money').default,
