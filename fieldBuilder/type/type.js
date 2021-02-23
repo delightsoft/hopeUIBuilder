@@ -17,7 +17,7 @@ export default {
 
   nanoid: require('./common/string').default,
   toggle: require('./ud/toggle').default,
-  phone: require('./ud/phone').default,
+  phone: require('./common/string').default,
   money: require('./ud/money').default,
   email: require('./ud/email').default,
   flatSubtableAsStructure: require('./ud/flatSubtableAsStructure').default,
