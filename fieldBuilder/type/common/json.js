@@ -12,7 +12,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
       filled: false,
       outlined: true,
       disabled: true,
-      readonly: true,
+      readonly: false,
+      type: 'textarea'
     },
     scopedSlots: {
       after: () => {

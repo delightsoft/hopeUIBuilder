@@ -33,7 +33,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
           this.h(
             'h3',
             {
-              class: 'col-12 text-h6',
+              class: 'col-12 text-h5',
               style: 'margin-top: 0px; margin-bottom: 4px;',
             },
             this.$t(this.$t(`${fieldInitData.field.$$key}.label`)),
@@ -58,9 +58,9 @@ export default function ({ fieldInitData, additionalFieldProps }) {
           !additionalFieldProps.sectionUntitled && this.h(
             'h3',
             {
-              class: 'text-h7',
+              class: 'text-h6',
             },
-            this.$t(this.$t(`${fieldInitData.field.$$key}.title`, { index: index + 1 }), { index: index + 1 })
+            `${index + 1}. ` + this.$t(this.$t(`${fieldInitData.field.$$key}.name`, { index: index + 1 }), { index: index + 1 })
           ),
           this.h(
             'div',
@@ -79,7 +79,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
               !fieldInitData.props.readonly && this.h(
                 'div',
                 {
-                  class: 'col-12',
+                  class: 'col-auto',
                 },
                 [
                   this.h(
