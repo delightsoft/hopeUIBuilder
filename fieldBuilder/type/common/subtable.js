@@ -44,8 +44,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
               class: `col-12`,
               style: 'margin-bottom: 0;',
             }, [
-            this.$t(this.$t(`${fieldInitData.field.$$key}.subtitle`)),
-          ]
+              this.$t(this.$t(`${fieldInitData.field.$$key}.subtitle`)),
+            ]
           ),
         ],
       ),
@@ -60,7 +60,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
             {
               class: 'text-h6',
             },
-            `${index + 1}. ` + this.$t(this.$t(`${fieldInitData.field.$$key}.name`, { index: index + 1 }), { index: index + 1 })
+            `${index + 1}. `
+            // ` + this.$t(this.$t(`${fieldInitData.field.$$key}.name`, { index: index + 1 }), { index: index + 1 })
           ),
           this.h(
             'div',
@@ -81,65 +82,65 @@ export default function ({ fieldInitData, additionalFieldProps }) {
                 {
                   class: 'col-auto',
                 },
-                [
-                  this.h(
-                    QBtn,
-                    {
-                      class: 'big-element',
-                      props: {
-                        color: 'primary',
-                        outline: true,
-                        unelevated: true,
-                        tabindex: fieldInitData.tabindex,
-                      },
-                      on: {
-                        click: () => fieldInitData.deleteElementFromArray(index),
-                      },
-                      directives: [
-                        {
-                          name: 'l',
-                          value: {
-                            [`${fieldInitData.field.$$key}.button.delete.label`]: this.$t(`${fieldInitData.field.$$key}.button.delete.label`),
-                          },
-                        }
-                      ],
-                    },
-                    this.$t(this.$t(`${fieldInitData.field.$$key}.button.delete.label`)),
-                  ),
-                ]
+                // [
+                //   this.h(
+                //     QBtn,
+                //     {
+                //       class: 'big-element',
+                //       props: {
+                //         color: 'primary',
+                //         outline: true,
+                //         unelevated: true,
+                //         tabindex: fieldInitData.tabindex,
+                //       },
+                //       on: {
+                //         click: () => fieldInitData.deleteElementFromArray(index),
+                //       },
+                //       directives: [
+                //         {
+                //           name: 'l',
+                //           value: {
+                //             [`${fieldInitData.field.$$key}.button.delete.label`]: this.$t(`${fieldInitData.field.$$key}.button.delete.label`),
+                //           },
+                //         }
+                //       ],
+                //     },
+                //     this.$t(this.$t(`${fieldInitData.field.$$key}.button.delete.label`)),
+                //   ),
+                // ]
               ),
             ]
           )
         ]
       )),
-
-      !fieldInitData.props.readonly && (fieldInitData.model[fieldInitData.fieldName]?.length < additionalFieldProps.elementsLimit || !additionalFieldProps.elementsLimit) ?
-        this.h(
-          QBtn,
-          {
-            class: 'col-12 big-element',
-            style: 'margin-bottom: 20px; margin-top: 20px;',
-            props: {
-              color: 'primary',
-              outline: true,
-              unelevated: true,
-              tabindex: fieldInitData.tabindex,
-            },
-            on: {
-              click: fieldInitData.addElementInArray,
-            },
-            directives: [
-              {
-                name: 'l',
-                value: {
-                  [`${fieldInitData.field.$$key}.action.create.label`]: this.$t(`${fieldInitData.field.$$key}.action.create.label`),
-                },
-              }
-            ],
-          },
-          this.$t(this.$t(`${fieldInitData.field.$$key}.action.create.label`)),
-        )
-        : undefined
+      
+      // !fieldInitData.props.readonly && (fieldInitData.model[fieldInitData.fieldName]?.length < additionalFieldProps.elementsLimit || !additionalFieldProps.elementsLimit) ?
+      //   this.h(
+      //     QBtn,
+      //     {
+      //       class: 'col-12 big-element',
+      //       style: 'margin-bottom: 20px; margin-top: 20px;',
+      //       props: {
+      //         color: 'primary',
+      //         outline: true,
+      //         unelevated: true,
+      //         tabindex: fieldInitData.tabindex,
+      //       },
+      //       on: {
+      //         click: fieldInitData.addElementInArray,
+      //       },
+      //       directives: [
+      //         {
+      //           name: 'l',
+      //           value: {
+      //             [`${fieldInitData.field.$$key}.action.create.label`]: this.$t(`${fieldInitData.field.$$key}.action.create.label`),
+      //           },
+      //         }
+      //       ],
+      //     },
+      //     this.$t(this.$t(`${fieldInitData.field.$$key}.action.create.label`)),
+      //   )
+      //   : undefined
     ]
   }
 }
