@@ -12,11 +12,12 @@ export default function ({ fieldInitData, additionalFieldProps }) {
       name: [...fieldInitData.parent.name || [], fieldInitData.fieldName],
     }
   }
-  console.log(545, fieldInitData)
+
+  console.log(666, fieldInitData)
 
   const children = this.getChildren({
     h: this.h,
-    fields: fieldInitData.field.fields.$$list,
+    fields: fieldInitData.field.refers[0].fields.$$list,
     model: fieldInitData.model,
     parent: _parent,
   });
@@ -25,8 +26,9 @@ export default function ({ fieldInitData, additionalFieldProps }) {
     return {}
   }
 
+
   return {
-    name: 'structure',
+    name: 'refers',
     component: 'div',
     readonlyComponent: readonly,
     classes: ['array-item', 'col-12'],

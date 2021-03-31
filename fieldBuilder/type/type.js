@@ -14,6 +14,7 @@ export default {
   subtable: require('./common/subtable').default,
   uuid: require('./common/uuid').default,
   structure: require('./common/structure').default,
+  refers: require('./common/refers').default,
 
   nanoid: require('./common/string').default,
   toggle: require('./ud/toggle').default,

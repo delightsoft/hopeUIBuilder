@@ -46,6 +46,7 @@ export default ({debug}) => {
         case 'date': // UTC
         case 'dateonly': // local
         case 'now':
+        case 'refers':
           col.align = 'right';
           break;
         default:
