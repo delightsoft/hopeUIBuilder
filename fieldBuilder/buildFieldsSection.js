@@ -94,7 +94,7 @@ export default ({ debug }) => {
             for (const key in this.errors) {
               if (this.errors.hasOwnProperty(key)) {
                 const error = this.errors[key];
-                
+
                 const splittedErrorPath = error.path.split(".")
                 if (splittedErrorPath[0] === field.name) {
                   if (splittedErrorPath.length > 1) {

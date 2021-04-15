@@ -13,8 +13,6 @@ export default function ({ fieldInitData, additionalFieldProps }) {
     }
   }
 
-  console.log(666, fieldInitData)
-
   const children = this.getChildren({
     h: this.h,
     fields: fieldInitData.field.refers[0].fields.$$list,
@@ -25,7 +23,6 @@ export default function ({ fieldInitData, additionalFieldProps }) {
   if (!children.filter(Boolean).length) {
     return {}
   }
-
 
   return {
     name: 'refers',

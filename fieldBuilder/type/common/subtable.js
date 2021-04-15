@@ -2,6 +2,12 @@ import { QBtn } from 'quasar'
 import readonly from '../../components/readonly/index.vue'
 
 export default function ({ fieldInitData, additionalFieldProps }) {
+  if (!fieldInitData.props.value) {
+    return {
+      name: 'subtable',
+      component: 'div',
+    }
+  }
   return {
     name: 'subtable',
     component: 'div',
@@ -113,7 +119,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
           )
         ]
       )),
-      
+
       // !fieldInitData.props.readonly && (fieldInitData.model[fieldInitData.fieldName]?.length < additionalFieldProps.elementsLimit || !additionalFieldProps.elementsLimit) ?
       //   this.h(
       //     QBtn,
