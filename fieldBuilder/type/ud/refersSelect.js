@@ -17,6 +17,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
     Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', false);
   }
 
+  Object.assign(fullObject, fieldInitData.props.value)
+
   this._api = new APICommon;
   const ref = `refersSelect_${fieldInitData.fieldName}`
   const doc = this.$model.docs[additionalFieldProps.data]
@@ -32,7 +34,6 @@ export default function ({ fieldInitData, additionalFieldProps }) {
     `${fieldInitData.props.required ? '*' : ''}`
   )
 
-  let optionsFormat = additionalFieldProps.optionsFormat || (i => ({ label: i.label, id: i.id }));
   let propPlaceholder = additionalFieldProps.propPlaceholder || fieldInitData.props.label || 'Select option';
 
   return {
@@ -57,46 +58,46 @@ export default function ({ fieldInitData, additionalFieldProps }) {
           name: 'refersSelect',
           ref,
           on: {
-            // tag: async (newTag) => {
-            //   const compo = this.$refs[ref]
-            //
-            //   const entities = await this._api.invoke({
-            //     service: 'hope',
-            //     method: 'list',
-            //     args: {
-            //       type: additionalFieldProps.data,
-            //       filter: {
-            //         hardMatchByLabel: newTag
-            //       },
-            //     }
-            //   })
-            //
-            //   let entity = { label: 'Не назначено' };
-            //
-            //   if (entities.data.length === 0) {
-            //     entity = doc.fields.$$new({ edit: false })
-            //     entity.label = newTag;
-            //   } else {
-            //     entity = entities.data[0]
-            //   }
-            //
-            //
-            //   const res = await this._api.invoke({
-            //     service: 'hope',
-            //     method: 'invoke',
-            //     args: {
-            //       type: additionalFieldProps.data,
-            //       update: doc.fields.$$update(entity, undefined, { noRev: true })
-            //     }
-            //   })
-            //
-            //   const tag = {
-            //     label: newTag,
-            //     docId: res.data.doc.id
-            //   }
-            //   this.uiModel[fieldInitData.fieldName].filteredOptions.push(tag)
-            //   compo.value.push(tag)
-            // },
+            tag: async (newTag) => {
+              const compo = this.$refs[ref]
+
+              const entities = await this._api.invoke({
+                service: 'hope',
+                method: 'list',
+                args: {
+                  type: additionalFieldProps.data,
+                  filter: {
+                    hardMatchByLabel: newTag
+                  },
+                }
+              })
+
+              let entity = { label: 'Не назначено' };
+
+              if (entities.data.length === 0) {
+                entity = doc.fields.$$new({ edit: false })
+                entity.label = newTag;
+              } else {
+                entity = entities.data[0]
+              }
+
+
+              const res = await this._api.invoke({
+                service: 'hope',
+                method: 'invoke',
+                args: {
+                  type: additionalFieldProps.data,
+                  update: doc.fields.$$update(entity, undefined, { noRev: true })
+                }
+              })
+
+              const tag = {
+                label: newTag,
+                id: res.data.doc.id
+              }
+              this.uiModel[fieldInitData.fieldName].filteredOptions.push(tag)
+              compo.value.push(tag)
+            },
             'search-change': async (val) => {
               Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', true);
 
@@ -115,7 +116,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
                 }
               })
 
-              const items = res.data.map(i => optionsFormat(i))
+              const items = res.data
               Vue.set(this.uiModel[fieldInitData.fieldName], 'filteredOptions', items);
               Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', false);
             },
@@ -124,8 +125,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
               Object.assign(fullObject, value)
             },
             close: (value, id) => {
-              Vue.set(this.uiModel[fieldInitData.fieldName], 'filteredOptions', []);
-            }
+              this.$set(this.uiModel[fieldInitData.fieldName], 'filteredOptions', ['hues']);
+            },
           },
           props: {
             placeholder: propPlaceholder,
@@ -142,9 +143,9 @@ export default function ({ fieldInitData, additionalFieldProps }) {
             deselectLabel: !!additionalFieldProps.multiple ? 'Press enter to remove' : '',
 
             value: fieldInitData.props.value,
-            error: fieldInitData.props.error,
-            'error-message': fieldInitData.props['error-message'],
-            tabindex: fieldInitData.tabindex,
+            // error: fieldInitData.props.error,
+            // 'error-message': fieldInitData.props['error-message'],
+            // tabindex: fieldInitData.tabindex,
           },
           scopedSlots: {
             noOptions: () => {
