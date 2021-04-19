@@ -6,18 +6,17 @@ import isDouble from '../../../utils/isDouble'
 
 export default function ({ fieldInitData, additionalFieldProps }) {
   const field = fieldInitData.field;
-  const extra = field.extra;
   const min = field.min;
   const max = field.max;
-  const scale = extra.scale;
+  const scale = field.extra?.scale;
 
   const anyDoubleRegExpWithoutScale = /^-?\d*[.]?\d*$/;
   const positiveDoubleRegExpWithoutScale = /^\d*[.]?\d*$/;
-  const anyDoubleRegExpWithScale = new RegExp(`^-?\d*[.]?\d{0,${fieldInitData.field.extra.scale}}$`);
-  const positiveDoubleRegExpWithScale = new RegExp(`^\d*[.]?\d{0,${fieldInitData.field.extra.scale}}$`);
+  const anyDoubleRegExpWithScale = new RegExp(`^-?\d*[.]?\d{0,${scale}}$`);
+  const positiveDoubleRegExpWithScale = new RegExp(`^\d*[.]?\d{0,${scale}}$`);
   let anyDoubleRegExp;
   let positiveDoubleRegExp;
-  if (fieldInitData.field.extra.scale) {
+  if (scale) {
     anyDoubleRegExp = anyDoubleRegExpWithScale;
     positiveDoubleRegExp = positiveDoubleRegExpWithScale;
   } else {
