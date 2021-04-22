@@ -7,6 +7,41 @@ import errorWrapper from '../../components/errorWrapper.vue'
 
 export default function ({ fieldInitData, additionalFieldProps }) {
 
+  const fillFilteredOptions = async ({ search, pageNo, pageSize = 3 }) => {
+    Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', true);
+
+    const filter = {}
+
+    if (!search) {
+      search = this.uiModel[fieldInitData.fieldName].search
+    }
+
+    if (search) {
+      Object.assign(filter, { search })
+    }
+
+    const res = await this._api.invoke({
+      service: 'hope',
+      method: 'list',
+      args: {
+        type: fieldInitData.field.refers[0].$$key,
+        filter,
+        pageNo,
+        pageSize,
+        order: {
+          asc: true
+        }
+      }
+    })
+
+    const items = res.data.docs
+    Vue.set(this.uiModel[fieldInitData.fieldName], 'filteredOptions', items);
+    Vue.set(this.uiModel[fieldInitData.fieldName], 'pageNo', pageNo);
+    Vue.set(this.uiModel[fieldInitData.fieldName], 'isLast', res.data.last);
+    Vue.set(this.uiModel[fieldInitData.fieldName], 'search', search);
+    Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', false);
+  }
+
   if (!this.uiModel.hasOwnProperty(fieldInitData.fieldName)) {
     Vue.set(this.uiModel, fieldInitData.fieldName, {});
     Vue.set(this.uiModel[fieldInitData.fieldName], 'options', null);
@@ -50,45 +85,14 @@ export default function ({ fieldInitData, additionalFieldProps }) {
           ref,
           on: {
             'search-change': async (val) => {
-              Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', true);
-
               if (!val.trim().length) {
                 Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', false);
                 return
               }
-
-              const res = await this._api.invoke({
-                service: 'hope',
-                method: 'list',
-                args: {
-                  type: fieldInitData.field.refers[0].$$key,
-                  filter: { search: val.toLowerCase() },
-                  limit: 15
-                }
-              })
-
-              const items = res.data
-              console.log(items)
-              Vue.set(this.uiModel[fieldInitData.fieldName], 'filteredOptions', items);
-              Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', false);
+              fillFilteredOptions({ search: val.toLowerCase(), pageNo: 1 })
             },
             open: async (val) => {
-              Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', true);
-
-              console.log(555, fieldInitData.field.refers[0].$$key, fieldInitData)
-
-              const res = await this._api.invoke({
-                service: 'hope',
-                method: 'list',
-                args: {
-                  type: fieldInitData.field.refers[0].$$key,
-                  limit: 15
-                }
-              })
-
-              const items = res.data
-              Vue.set(this.uiModel[fieldInitData.fieldName], 'filteredOptions', items);
-              Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', false);
+              fillFilteredOptions({ pageNo: 1 })
             },
             input: (value) => {
               fieldInitData.onInput(value)
@@ -103,7 +107,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
             'hide-selected': false,
             'internal-search': true,
             label: 'label',
-            // 'options-limit': 20,
+            'options-limit': 20,
             taggable: additionalFieldProps.taggable,
             closeOnSelect: true,
             loading: this.uiModel[fieldInitData.fieldName].isLoading,
@@ -122,7 +126,6 @@ export default function ({ fieldInitData, additionalFieldProps }) {
               return 'Start typing to search'
             },
             singleLabel: (value) => {
-              console.log(333, value)
               const val = value.option
               if (val && val.label) {
                 return this.h(
@@ -170,6 +173,44 @@ export default function ({ fieldInitData, additionalFieldProps }) {
                   },
                 },
                 [propPlaceholder, fieldInitData.props.required ? requiredElement : '']
+              )
+            },
+            afterList: (value) => {
+              if (this.uiModel[fieldInitData.fieldName].isLast) {
+                return
+              }
+              return this.h(
+                'button',
+                {
+                  style: {
+                    width: '100%',
+                  },
+                  on: {
+                    click: async () => {
+                      fillFilteredOptions({ pageNo: ++this.uiModel[fieldInitData.fieldName].pageNo })
+                    }
+                  }
+                },
+                '>>'
+              )
+            },
+            beforeList: (value) => {
+              if (this.uiModel[fieldInitData.fieldName].pageNo === 1) {
+                return
+              }
+              return this.h(
+                'button',
+                {
+                  style: {
+                    width: '100%',
+                  },
+                  on: {
+                    click: async () => {
+                      fillFilteredOptions({ pageNo: --this.uiModel[fieldInitData.fieldName].pageNo })
+                    }
+                  }
+                },
+                '<<'
               )
             }
           }
