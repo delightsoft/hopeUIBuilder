@@ -1,13 +1,23 @@
+import {QIcon, QSelect} from 'quasar'
 import readonly from '../../components/readonly'
-import Vue from 'vue'
-import APICommon from '../../../../APICommon'
-import Multiselect from 'vue-multiselect'
-import 'vue-multiselect/dist/vue-multiselect.min.css';
-import errorWrapper from '../../components/errorWrapper.vue'
+import tooltip from '../../components/tooltip'
+import Vue from "vue";
+import APICommon from "src/lib/APICommon";
+import errorWrapper from "src/lib/hopeUIBuilder/fieldBuilder/components/errorWrapper";
 
-export default function ({ fieldInitData, additionalFieldProps }) {
+export default function ({fieldInitData, additionalFieldProps}) {
+  const filterFn = async  (val, update, abort) => {
+    this.query = val
+    if (!val || val.length < 6) {
+      this.options = []
+      abort()
+      return
+    }
+    this.options = await this.search(val)
+    update()
+  }
 
-  const fillFilteredOptions = async ({ search, pageNo, pageSize = 3 }) => {
+  const fillFilteredOptions = async ({search, pageNo, pageSize = 3}) => {
     Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', true);
 
     const filter = {}
@@ -17,7 +27,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
     }
 
     if (search) {
-      Object.assign(filter, { search })
+      Object.assign(filter, {search})
     }
 
     const res = await this._api.invoke({
@@ -79,143 +89,92 @@ export default function ({ fieldInitData, additionalFieldProps }) {
     },
     scopedSlots: {
       default: () => this.h(
-        Multiselect,
+        QSelect,
         {
           name: 'refers',
           ref,
+          readonlyComponent: readonly,
           on: {
-            'search-change': async (val) => {
-              if (!val.trim().length) {
-                Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', false);
-                return
-              }
-              fillFilteredOptions({ search: val.toLowerCase(), pageNo: 1 })
-            },
-            open: async (val) => {
-              fillFilteredOptions({ pageNo: 1 })
-            },
-            input: (value) => {
-              fieldInitData.onInput(value)
-              Object.assign(fieldInitData.props, { value })
-            },
-            close: (value, id) => {
-              this.$set(this.uiModel[fieldInitData.fieldName], 'filteredOptions', ['hues']);
-            },
+            input: fieldInitData.onInput,
+            filter: fillFilteredOptions,
           },
           props: {
-            placeholder: propPlaceholder,
-            'hide-selected': false,
-            'internal-search': true,
-            label: 'label',
-            'options-limit': 20,
-            taggable: additionalFieldProps.taggable,
-            closeOnSelect: true,
-            loading: this.uiModel[fieldInitData.fieldName].isLoading,
-            options: this.uiModel[fieldInitData.fieldName].filteredOptions || [],
-            internalSearch: false,
-            allowEmpty: !!additionalFieldProps.multiple,
-            deselectLabel: !!additionalFieldProps.multiple ? 'Press enter to remove' : '',
 
-            value: fieldInitData.props.value,
-            // error: fieldInitData.props.error,
-            // 'error-message': fieldInitData.props['error-message'],
-            // tabindex: fieldInitData.tabindex,
+            placeholder: propPlaceholder,
+            loading: this.uiModel[fieldInitData.fieldName].isLoading,
+            clearable: true,
+            standout: true,
+            emitValue: true,
+            mapOptions: true,
+
+            hideDropdownIcon: true,
+            filled: false,
+            outlined: true,
+            hideSelected: true,
+            useInput: true,
+            inputDebounce: 1000,
+            inputClass: 'text-white',
+            fillInput: true,
+            bgColor: 'primary',
+
+            optionLabel: 'label',
+            optionValue: 'value',
+            optionsDense: true,
+            options: [
+              ...fieldInitData.field.enum.$$list.reduce((acc, option) => {
+                if (!option.extra || !option.extra.hasOwnProperty('selectable') || option.extra.selectable)
+                  acc.push(
+                    {
+                      label: this.$t(this.$t(option.$$key)),
+                      value: option.name,
+                    });
+                return acc;
+              }, []),
+            ],
+            ...fieldInitData.props.readonly && {value: this.$t(this.$t(fieldInitData.field.enum.$$list.find(option => fieldInitData.model[fieldInitData.fieldName] === option.name)?.$$key))},
           },
+          attrs: {
+            tabindex: fieldInitData.tabindex,
+          },
+          directives: [
+            {
+              name: 'l',
+              value: {
+                [`${fieldInitData.field.$$key}.label`]: this.$t(`${fieldInitData.field.$$key}.label`),
+                [`${fieldInitData.field.$$key}.hint`]: this.$t(`${fieldInitData.field.$$key}.hint`),
+                [`${fieldInitData.field.$$key}.tooltip`]: this.$t(`${fieldInitData.field.$$key}.tooltip`),
+                ...fieldInitData.field.enum.$$list.reduce((acc, option) => ({
+                  ...acc,
+                  [option.$$key]: this.$t(option.$$key)
+                }), {}),
+              },
+            }
+          ],
           scopedSlots: {
-            noOptions: () => {
-              return 'Start typing to search'
-            },
-            singleLabel: (value) => {
-              const val = value.option
-              if (val && val.label) {
+            after: () => {
+              if (this.$t(this.$t(`${fieldInitData.field.$$key}.tooltip`))) {
                 return this.h(
-                  'div',
+                  QIcon,
                   {
-                    style: {
-                      display: 'flex'
-                    }
+                    class: ['tooltip', 'cursor-help'],
+                    props: {
+                      name: 'help',
+                      size: '20px',
+                    },
                   },
                   [
                     this.h(
-                      'div',
-                      {
-                        style: {
-                          marginBottom: '-3px',
-                          marginRight: '4px',
-                          padding: '4px 10px 4px 10px',
-                          lineHeight: '14px',
-                        },
-                        class: ['multiselect__tag']
-                      },
-                      val.label
-                    ),
+                      tooltip,
+                      this.$t(this.$t(`${fieldInitData.field.$$key}.tooltip`))
+                    )
                   ]
                 )
               }
-
-              return this.h(
-                'div',
-                {
-                  style: {
-                    display: 'flex',
-                    color: '#adadad',
-                  },
-                },
-                [propPlaceholder, fieldInitData.props.required ? requiredElement : '']
-              )
             },
-            placeholder: (value) => {
-              return this.h(
-                'div',
-                {
-                  style: {
-                    display: 'flex'
-                  },
-                },
-                [propPlaceholder, fieldInitData.props.required ? requiredElement : '']
-              )
-            },
-            afterList: (value) => {
-              if (this.uiModel[fieldInitData.fieldName].isLast) {
-                return
-              }
-              return this.h(
-                'button',
-                {
-                  style: {
-                    width: '100%',
-                  },
-                  on: {
-                    click: async () => {
-                      fillFilteredOptions({ pageNo: ++this.uiModel[fieldInitData.fieldName].pageNo })
-                    }
-                  }
-                },
-                '>>'
-              )
-            },
-            beforeList: (value) => {
-              if (this.uiModel[fieldInitData.fieldName].pageNo === 1) {
-                return
-              }
-              return this.h(
-                'button',
-                {
-                  style: {
-                    width: '100%',
-                  },
-                  on: {
-                    click: async () => {
-                      fillFilteredOptions({ pageNo: --this.uiModel[fieldInitData.fieldName].pageNo })
-                    }
-                  }
-                },
-                '<<'
-              )
-            }
           }
         }
-      ),
+      )
     }
   }
 }
+
