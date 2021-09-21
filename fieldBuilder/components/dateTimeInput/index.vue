@@ -102,7 +102,7 @@ export default {
           htmlType: 'time',
         },
         'timestamp': {
-          format: 'YYYY-MM-DD HH:mm',
+          format: 'YYYY-MM-DDTHH:mmZ',
           localeFormatName: 'date',
           htmlType: 'datetime-local',
         },

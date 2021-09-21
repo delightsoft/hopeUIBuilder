@@ -70,7 +70,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
     }
   })
 
-  if (doc?.fields[fieldInitData.fieldName].null) {
+  if (doc?.fields?.[fieldInitData.fieldName]?.null) {
     optionsForGroup.push({
       label: nullValue,
       value: nullValue
