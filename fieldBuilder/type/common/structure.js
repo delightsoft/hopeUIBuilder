@@ -12,7 +12,6 @@ export default function ({ fieldInitData, additionalFieldProps }) {
       name: [...fieldInitData.parent.name || [], fieldInitData.fieldName],
     }
   }
-  console.log(545, fieldInitData)
 
   const children = this.getChildren({
     h: this.h,
