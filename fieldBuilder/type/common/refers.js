@@ -6,8 +6,13 @@ import { QOptionGroup } from "quasar";
 
 export default function ({ fieldInitData, additionalFieldProps }) {
 
+  const nullValue = 'nullValue'
+
   const getType = () => {
-    return fieldInitData.model[fieldInitData.fieldName]?._type || fieldInitData.field.refers[0].$$key
+    if (fieldInitData.field.refers.length === 1) {
+      return fieldInitData.field.refers[0].$$key
+    }
+    return fieldInitData.model[fieldInitData.fieldName]?._type || nullValue
   }
 
   const fillFilteredOptions = async ({ search, pageNo, pageSize = 7, docType }) => {
@@ -38,6 +43,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
     })
 
     const items = res.data.docs
+
     Vue.set(this.uiModel[fieldInitData.fieldName], 'filteredOptions', items);
     Vue.set(this.uiModel[fieldInitData.fieldName], 'pageNo', pageNo);
     Vue.set(this.uiModel[fieldInitData.fieldName], 'isLast', res.data.last);
@@ -55,7 +61,21 @@ export default function ({ fieldInitData, additionalFieldProps }) {
   this._api = new APICommon;
 
   const ref = `refers_${fieldInitData.fieldName}`
-  const doc = this.$model.docs[additionalFieldProps.data]
+  const doc = this.$model.docs[this.options.category]
+
+  const optionsForGroup = fieldInitData.field.refers.map(item => {
+    return {
+      label: item.$$key,
+      value: item.$$key
+    }
+  })
+
+  if (doc?.fields[fieldInitData.fieldName].null) {
+    optionsForGroup.push({
+      label: nullValue,
+      value: nullValue
+    })
+  }
 
   const requiredElement = this.h(
     'div',
@@ -68,7 +88,8 @@ export default function ({ fieldInitData, additionalFieldProps }) {
     `${fieldInitData.props.required ? '*' : ''}`
   )
 
-  let propPlaceholder = additionalFieldProps.propPlaceholder || fieldInitData.props.label || 'Select option';
+  let propPlaceholder = getType() !== nullValue ? additionalFieldProps.propPlaceholder || fieldInitData.props.label || 'Select option'
+    : 'Select document type'
 
   const refers = () => {
     return this.h(
@@ -82,19 +103,19 @@ export default function ({ fieldInitData, additionalFieldProps }) {
               Vue.set(this.uiModel[fieldInitData.fieldName], 'isLoading', false);
               return
             }
-            fillFilteredOptions({
+            await fillFilteredOptions({
               search: val.toLowerCase(),
               pageNo: 1,
               docType: getType()
             })
           },
           open: async (val) => {
-            fillFilteredOptions({ pageNo: 1, docType: getType() })
+            await fillFilteredOptions({ pageNo: 1, docType: getType() })
           },
-          input: (value) => {
-            fieldInitData.onInput(value)
+          input: fieldInitData.inputDebounce(value => {
             Object.assign(fieldInitData.props, { value })
-          },
+            fieldInitData.onInput(value)
+          }),
           close: (value, id) => {
             this.$set(this.uiModel[fieldInitData.fieldName], 'filteredOptions', ['hues']);
           },
@@ -110,9 +131,9 @@ export default function ({ fieldInitData, additionalFieldProps }) {
           loading: this.uiModel[fieldInitData.fieldName].isLoading,
           options: this.uiModel[fieldInitData.fieldName].filteredOptions || [],
           internalSearch: false,
-          allowEmpty: !!additionalFieldProps.multiple,
+          allowEmpty: true,
+          disabled: getType() === nullValue,
           deselectLabel: !!additionalFieldProps.multiple ? 'Press enter to remove' : '',
-          disable: !!getType(),
           value: fieldInitData.props.value,
         },
         scopedSlots: {
@@ -181,7 +202,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
                 },
                 on: {
                   click: async () => {
-                    fillFilteredOptions({
+                    await fillFilteredOptions({
                       pageNo: ++this.uiModel[fieldInitData.fieldName].pageNo,
                       docType: getType()
                     })
@@ -203,7 +224,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
                 },
                 on: {
                   click: async () => {
-                    fillFilteredOptions({
+                    await fillFilteredOptions({
                       pageNo: --this.uiModel[fieldInitData.fieldName].pageNo,
                       docType: getType()
                     })
@@ -226,17 +247,17 @@ export default function ({ fieldInitData, additionalFieldProps }) {
         ref,
         on: {
           input: (value) => {
+            if (value === nullValue) {
+              fieldInitData.model[fieldInitData.fieldName] = null
+              return
+            }
+            fieldInitData.model[fieldInitData.fieldName] = this.$model.docs[value].fields.$$new()
             fieldInitData.model[fieldInitData.fieldName]._type = value
           },
         },
         props: {
           label: 'label',
-          options: fieldInitData.field.refers.map(item => {
-            return {
-              label: item.$$key,
-              value: item.$$key
-            }
-          }),
+          options: optionsForGroup,
           value: getType(),
         },
       }
