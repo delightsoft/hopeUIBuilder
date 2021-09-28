@@ -1,6 +1,11 @@
 import { QBtn } from 'quasar'
 import readonly from '../../components/readonly/index.vue'
 import draggable from 'vuedraggable'
+import {
+  fasAngleDoubleDown,
+  fasAngleDoubleUp, fasAngleDown, fasAngleUp
+} from "@quasar/extras/fontawesome-v5";
+import { deepClone } from "../../../../../../../lib/hope/lib/utils";
 
 export default function ({ fieldInitData, additionalFieldProps }) {
   if (!fieldInitData.props.value) {
@@ -11,6 +16,29 @@ export default function ({ fieldInitData, additionalFieldProps }) {
   }
 
   let isDragging = false
+
+  const moveElement = (index, indexDestination) => {
+    let arr = deepClone(fieldInitData.props.value);
+    [arr[index], arr[indexDestination]] = [arr[indexDestination], arr[index]]
+    fieldInitData.onInput(arr)
+  }
+
+  const moveButtonGenerator = (index, indexDestination, icon) => this.h(
+    QBtn,
+    {
+      class: 'big-element',
+      props: {
+        color: 'primary',
+        outline: true,
+        unelevated: true,
+        tabindex: fieldInitData.tabindex,
+        icon: icon
+      },
+      on: {
+        click: () => moveElement(index, indexDestination),
+      },
+    },
+  )
 
   const fieldChildren = fieldInitData.model[fieldInitData.fieldName].map((model, index) => this.h(
     'div',
@@ -34,6 +62,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
           ...this.getChildren({
             h: this.h,
             fields: fieldInitData.field.fields.$$list,
+            class: 'border',
             parent: {
               name: [...fieldInitData.parent.name || [], fieldInitData.fieldName],
               index: [...fieldInitData.parent.index || [], index],
@@ -67,8 +96,12 @@ export default function ({ fieldInitData, additionalFieldProps }) {
                     }
                   ],
                 },
-                this.$t(this.$t(`${fieldInitData.field.$$key}.button.delete.label`)),
+                'delete',
               ),
+              index > 0 && moveButtonGenerator(index, index - 1, fasAngleUp),
+              index < fieldInitData.props.value.length - 1 && moveButtonGenerator(index, index + 1, fasAngleDown),
+              index > 0 && moveButtonGenerator(index, 0, fasAngleDoubleUp),
+              index < fieldInitData.props.value.length - 1 && moveButtonGenerator(index, fieldInitData.props.value.length - 1, fasAngleDoubleDown),
             ]
           ),
         ]
@@ -125,7 +158,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
             }
           ],
         },
-        this.$t(this.$t(`${fieldInitData.field.$$key}.action.create.label`)),
+        `${fieldInitData.field.$$key} create`,
       )
       : undefined
   ]
