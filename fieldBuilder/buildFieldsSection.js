@@ -321,10 +321,11 @@ export default ({ debug }) => {
 }
 
 function _getModel(model, parent) {
+
   if (JSON.stringify(parent) !== '{}') {
     return parent.name.reduce((acc, name, index) => {
       acc = acc[name];
-      if (parent.index[index] + 1) {
+      if (parent.index && parent.index[index] + 1) {
         acc = acc[parent.index[index]];
       }
       return acc;

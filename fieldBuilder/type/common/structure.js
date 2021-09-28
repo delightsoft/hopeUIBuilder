@@ -6,7 +6,7 @@ export default function ({ fieldInitData, additionalFieldProps }) {
 
   if (parent) {
     _parent = cloneDeep(fieldInitData.parent);
-    // _parent.name.push(fieldInitData.fieldName)
+    _parent.name = [...fieldInitData.parent.name || [], fieldInitData.fieldName]
   } else {
     _parent = {
       name: [...fieldInitData.parent.name || [], fieldInitData.fieldName],
